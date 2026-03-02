@@ -74,68 +74,49 @@
 </div>
 
 
-<!-- Script al final para que el DOM ya esté cargado -->
-<script>
-    // Escucha el envío del formulario
-    document.getElementById("loginForm").addEventListener("submit", function(e){
-        
-        e.preventDefault(); // Evita que la página se recargue
+<!-- Script al final para que el DOM ya esté cargado --><script>
+document.getElementById("loginForm").addEventListener("submit", function(e){
+    e.preventDefault();
 
-        let correo = document.getElementById("email").value.trim(); // Obtiene correo
-        let contraseña = document.getElementById("password").value.trim(); // Obtiene contraseña
-        let cajaError = document.getElementById("errorBox"); // Caja de errores
+    let correo = document.getElementById("email").value.trim();
+    let contraseña = document.getElementById("password").value.trim();
+    let cajaError = document.getElementById("errorBox");
 
-        cajaError.innerHTML = ""; // Limpia errores previos
+    cajaError.innerHTML = "";
 
-        // Validación campos vacíos
-        if(correo === "" || contraseña === ""){
-            cajaError.innerHTML = "<p class='error-text'> Llena todos los campos.</p>";
-            return;
+    // LOGIN DE PRUEBA
+    if(correo === "1" && contraseña === "1"){
+        localStorage.setItem("usuarioNombre", "Prueba");
+        localStorage.setItem("usuarioApellidoP", "Admin");
+        localStorage.setItem("usuarioApellidoM", "Test");
+        localStorage.setItem("usuarioRol", "1");
+        window.location.href = "dashboard.html";
+        return;
+    }
+
+    // LOGIN NORMAL POR API
+    fetch("http://auraa.ddns.net:8000/getusuarios")
+    .then(response => response.json())
+    .then(lista => {
+        const usuarioEncontrado = lista.find(u => 
+            u.correo === correo && u.contra === contraseña
+        );
+
+        if (usuarioEncontrado) {
+            localStorage.setItem("usuarioNombre", usuarioEncontrado.nombre);
+            localStorage.setItem("usuarioApellidoP", usuarioEncontrado.apellido_p);
+            localStorage.setItem("usuarioApellidoM", usuarioEncontrado.apellido_m);
+            localStorage.setItem("usuarioRol", usuarioEncontrado.id_rol);
+            localStorage.setItem("user", JSON.stringify(usuarioEncontrado));
+            window.location.href = "dashboard.html";
+        } else {
+            cajaError.innerHTML = "<p class='error-text'>Correo o contraseña incorrectos.</p>";
         }
-
-        // Validación formato correo
-        const validarCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if(!validarCorreo.test(correo)){
-            cajaError.innerHTML = "<p class='error-text'>Ingresa un correo válido.</p>";
-            return;
-        }
-
-        // Validación longitud contraseña
-        if(contraseña.length < 6){
-            cajaError.innerHTML = "<p class='error-text'>La contraseña debe tener mínimo 6 caracteres.</p>";
-            return;
-        }
-
-        // Petición a la API
-        fetch("http://auraa.ddns.net:8000/getusuarios")
-        .then(response => response.json())
-        .then(lista => {
-
-            const usuarioEncontrado = lista.find(u => 
-                u.correo === correo && u.contra === contraseña
-            );
-
-            if (usuarioEncontrado) {
-
-                localStorage.setItem("usuarioNombre", usuarioEncontrado.nombre);
-                localStorage.setItem("usuarioApellidoP", usuarioEncontrado.apellido_p);
-                localStorage.setItem("usuarioApellidoM", usuarioEncontrado.apellido_m);
-                localStorage.setItem("usuarioRol", usuarioEncontrado.id_rol);
-                localStorage.setItem("user", JSON.stringify(usuarioEncontrado));
-
-                window.location.href = "dashboard.html";
-
-            } else {
-                cajaError.innerHTML = "<p class='error-text'>Correo o contraseña incorrectos.</p>";
-            }
-        })
-        .catch(error => {
-            cajaError.innerHTML = "<p class='error-text'>Error al conectar con el servidor.</p>";
-        });
-
+    })
+    .catch(error => {
+        cajaError.innerHTML = "<p class='error-text'>Error al conectar con el servidor.</p>";
     });
+});
 </script>
-
 </body>
 </html>
