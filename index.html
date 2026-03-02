@@ -1,12 +1,9 @@
-<!DOCTYPE html> <!-- Define documento HTML5 -->
-<html lang="es"> <!-- Idioma del documento -->
-
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8"> <!-- Permite caracteres especiales -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <!-- Hace que el diseño sea responsive en móviles -->
-
-    <title>Iniciar Sesión</title> <!-- Título de la pestaña -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,37 +11,33 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     
-    <!-- Tu archivo CSS personalizado -->
+    <!-- Tu CSS -->
     <link rel="stylesheet" href="loginStyle.css">
 </head>
 
-<body class="auth-bg"> <!-- Clase para fondo general -->
+<body class="auth-bg">
 
-<!-- Contenedor principal usando flex en lugar de row directo -->
 <div class="login-wrapper d-flex flex-column flex-md-row">
 
-    <!-- Sección izquierda (Formulario) -->
     <div class="left-section col-12 col-md-6 d-flex flex-column justify-content-center">
+        <div class="form-container">
 
-        <div class="form-container"> <!-- Contenedor interno para centrar contenido -->
+            <h1 class="mb-4 login-title">Iniciar Sesión</h1>
 
-            <h1 class="mb-4 login-title">Iniciar Sesión</h1> <!-- Título -->
+            <div id="errorBox"></div>
 
-            <div id="errorBox"></div> <!-- Contenedor para mensajes de error -->
-
-            <form id="loginForm"> <!-- Formulario principal -->
+            <form id="loginForm">
 
                 <label class="mb-2">Correo electrónico</label>
-
                 <div class="position-relative mb-4">
-                    <i class="bi bi-envelope input-icon"></i> <!-- Icono -->
-                    <input type="email" id="email" class="form-control input-custom">
+                    <i class="bi bi-envelope input-icon"></i>
+                    <!-- CAMBIADO A TEXT PARA PODER USAR 1 -->
+                    <input type="text" id="email" class="form-control input-custom">
                 </div>
 
                 <label class="mb-2">Contraseña</label>
-
                 <div class="position-relative mb-4">
-                    <i class="bi bi-lock input-icon"></i> <!-- Icono -->
+                    <i class="bi bi-lock input-icon"></i>
                     <input type="password" id="password" class="form-control input-custom">
                 </div>
 
@@ -66,15 +59,11 @@
         </div>
     </div>
 
-    <!-- Sección derecha (Imagen decorativa) -->
-    <div class="right-section col-12 col-md-6">
-        <!-- La imagen será fondo en desktop y bloque visual en móvil -->
-    </div>
+    <div class="right-section col-12 col-md-6"></div>
 
 </div>
 
-
-<!-- Script al final para que el DOM ya esté cargado --><script>
+<script>
 document.getElementById("loginForm").addEventListener("submit", function(e){
     e.preventDefault();
 
@@ -84,7 +73,12 @@ document.getElementById("loginForm").addEventListener("submit", function(e){
 
     cajaError.innerHTML = "";
 
-    // LOGIN DE PRUEBA
+    if(correo === "" || contraseña === ""){
+        cajaError.innerHTML = "<p class='error-text'>Llena todos los campos.</p>";
+        return;
+    }
+
+    // LOGIN DE PRUEBA 1 / 1
     if(correo === "1" && contraseña === "1"){
         localStorage.setItem("usuarioNombre", "Prueba");
         localStorage.setItem("usuarioApellidoP", "Admin");
@@ -94,7 +88,7 @@ document.getElementById("loginForm").addEventListener("submit", function(e){
         return;
     }
 
-    // LOGIN NORMAL POR API
+    // LOGIN REAL POR API
     fetch("http://auraa.ddns.net:8000/getusuarios")
     .then(response => response.json())
     .then(lista => {
@@ -118,5 +112,6 @@ document.getElementById("loginForm").addEventListener("submit", function(e){
     });
 });
 </script>
+
 </body>
 </html>
