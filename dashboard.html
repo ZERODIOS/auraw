@@ -54,6 +54,17 @@
     <div class="main-content">
         <h2 class="title-section mb-4">DASHBOARD</h2>
 
+        <!-- Selector de cantidad de datos a mostrar -->
+        <div class="mb-3 d-flex justify-content-end">
+            <label for="limitDatos" class="form-label me-2 align-self-center">Mostrar:</label>
+            <select id="limitDatos" class="form-select w-auto">
+                <option value="0">Todos</option>
+                <option value="5">Últimos 5</option>
+                <option value="10" selected>Últimos 10</option>
+                <option value="15">Últimos 15</option>
+            </select>
+        </div>
+
         <div class="stats-grid">
           <div class="stat-card">
             <div class="status"></div>
@@ -110,6 +121,312 @@
           <div class="card"><canvas id="co2Chart"></canvas></div>
           <div class="card"><canvas id="pmChart"></canvas></div>
           <div class="card"><canvas id="noiseChart"></canvas></div>
+          <div class="card"><canvas id="lightChart"></canvas></div>
+        </div>
+    </div>
+
+    <script>
+    let tempChart, humChart, co2Chart, pmChart, noiseChart, lightChart;
+    let datosCompletos = []; // ← guardamos todos los datos recibidos
+
+    const selectLimit = document.getElementById("limitDatos");
+
+    async function cargarDatos() {
+      try {
+        const res = await fetch("https://api-aura-204e.onrender.com/getmediciones");
+        const datos = await res.json();
+
+        if (!Array.isArray(datos) || datos.length === 0) return;
+
+        // Guardamos la lista completa
+        datosCompletos = datos;
+
+        // Aplicamos el límite actual seleccionado
+        actualizarConLimite();
+
+      } catch (error) {
+        console.error("Error al cargar datos:", error);
+      }
+    }
+
+    function getDatosLimitados() {
+      const limite = parseInt(selectLimit.value);
+      if (limite === 0 || limite > datosCompletos.length) {
+        return datosCompletos;
+      }
+      return datosCompletos.slice(-limite);
+    }
+
+    function actualizarConLimite() {
+      const datos = getDatosLimitados();
+
+      const labels = datos.map(d => d.fecha_hora.split("T")[1]);
+
+      const temp  = datos.map(d => d.temperatura);
+      const hum   = datos.map(d => d.humedad);
+      const co2   = datos.map(d => d.co2);
+      const luz   = datos.map(d => d.iluminacion);
+
+      const pm_estaticos = [8, 10, 12, 14, 16, 18]; // se mantiene como estaba
+
+      // Ruido del último dato disponible
+      const ruido = datos.length > 0 && datos[datos.length - 1].ruido 
+                    ? datos[datos.length - 1].ruido 
+                    : 55;
+
+      // Actualizar tarjetas (siempre con el último valor real, no filtrado)
+      if (datosCompletos.length > 0) {
+        const ultimo = datosCompletos[datosCompletos.length - 1];
+        document.getElementById('tempValue').textContent = `${ultimo.temperatura}°C`;
+        document.getElementById('co2Value').textContent  = `${ultimo.co2} ppm`;
+        document.getElementById('noiseValue').textContent = `${ruido} dB`;
+        document.getElementById('lightValue').textContent = `${ultimo.iluminacion} lux`;
+        document.getElementById('humValue').textContent   = `${ultimo.humedad}%`;
+        document.getElementById('pmValue').textContent    = `${pm_estaticos[pm_estaticos.length - 1]} µg/m³`;
+      }
+
+      actualizarGraficas(labels, temp, hum, co2, pm_estaticos, ruido, luz);
+    }
+
+    function crearGraficas(labels, temp, hum, co2, pm, noise, light) {
+      // ... (exactamente igual que tu versión original, sin cambios)
+      tempChart = new Chart(document.getElementById("tempChart"), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{ 
+            label: 'Temperatura (°C)', 
+            data: temp, 
+            borderColor: 'rgb(239, 68, 68)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Temperatura' }
+          }
+        }
+      });
+
+      humChart = new Chart(document.getElementById("humChart"), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{ 
+            label: 'Humedad (%)', 
+            data: hum, 
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Humedad' }
+          }
+        }
+      });
+
+      co2Chart = new Chart(document.getElementById("co2Chart"), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ 
+            label: 'CO2 (ppm)', 
+            data: co2, 
+            backgroundColor: 'rgba(34, 197, 94, 0.6)',
+            borderColor: 'rgb(34, 197, 94)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'CO₂' }
+          }
+        }
+      });
+
+      pmChart = new Chart(document.getElementById("pmChart"), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'PM1.0', data: pm.map(x => x * 0.6), backgroundColor: 'rgba(147, 197, 253, 0.8)' },
+            { label: 'PM2.5', data: pm, backgroundColor: 'rgba(251, 146, 60, 0.8)' },
+            { label: 'PM10', data: pm.map(x => x * 1.8), backgroundColor: 'rgba(156, 163, 175, 0.8)' }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Partículas (PM)' }
+          }
+        }
+      });
+
+      noiseChart = new Chart(document.getElementById("noiseChart"), {
+        type: 'doughnut',
+        data: {
+          labels: ["Ruido", "Restante"],
+          datasets: [{
+            data: [noise, 100 - noise], 
+            backgroundColor: ["rgb(251, 146, 60)", "rgb(229, 231, 235)"]
+          }]
+        },
+        options: { 
+          rotation: -90, 
+          circumference: 180,
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Nivel de Ruido' },
+            legend: { display: false }
+          }
+        }
+      });
+
+      lightChart = new Chart(document.getElementById("lightChart"), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{ 
+            label: "Iluminación (lux)", 
+            data: light, 
+            borderColor: 'rgb(234, 179, 8)',
+            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Iluminación' }
+          }
+        }
+      });
+    }
+
+    function actualizarGraficas(labels, temp, hum, co2, pm, noise, light) {
+
+      if (!tempChart) {
+        crearGraficas(labels, temp, hum, co2, pm, noise, light);
+        return;
+      }
+
+      tempChart.data.labels = labels;
+      humChart.data.labels = labels;
+      co2Chart.data.labels = labels;
+      pmChart.data.labels = labels;
+      lightChart.data.labels = labels;
+
+      tempChart.data.datasets[0].data = temp;
+      humChart.data.datasets[0].data = hum;
+      co2Chart.data.datasets[0].data = co2;
+      lightChart.data.datasets[0].data = light;
+
+      pmChart.data.datasets[0].data = pm.map(x => x * 0.6);
+      pmChart.data.datasets[1].data = pm;
+      pmChart.data.datasets[2].data = pm.map(x => x * 1.8);
+
+      // El doughnut de ruido se actualiza completo
+      noiseChart.data.datasets[0].data = [noise, 100 - noise];
+      noiseChart.update();
+
+      tempChart.update();
+      humChart.update();
+      co2Chart.update();
+      pmChart.update();
+      lightChart.update();
+    }
+
+    // ── Eventos ────────────────────────────────────────
+    selectLimit.addEventListener("change", actualizarConLimite);
+
+    // Carga inicial y refresco automático
+    cargarDatos();
+    setInterval(cargarDatos, 5000);
+    </script>
+
+    <!-- El resto de tus scripts (dark mode, menú, logout, nombre usuario) permanecen iguales -->
+    <script>
+    (function () {
+        const toggle = document.getElementById("toggleDark");
+        if (!toggle) return;
+
+        const isDark = localStorage.getItem("modo-oscuro") === "true";
+        if (isDark) {
+            document.body.classList.add("dark"); 
+            if (toggle.classList.contains('bi-moon')) toggle.classList.replace('bi-moon', 'bi-sun');
+        } else {
+            if (toggle.classList.contains('bi-sun')) toggle.classList.replace('bi-sun', 'bi-moon');
+        }
+
+        toggle.addEventListener('click', () => {
+            const nowDark = document.body.classList.toggle('dark');
+            localStorage.setItem('modo-oscuro', nowDark);
+
+            if (nowDark) {
+                if (toggle.classList.contains('bi-moon')) toggle.classList.replace('bi-moon', 'bi-sun');
+            } else {
+                if (toggle.classList.contains('bi-sun')) toggle.classList.replace('bi-sun', 'bi-moon');
+            }
+        });
+    })();
+    </script>
+
+    <script>
+        const btnMenu = document.getElementById("btnMenu");
+        const sidebar = document.querySelector(".sidebar");
+        const mainContent = document.querySelector(".main-content");
+
+        btnMenu.addEventListener("click", () => {
+            sidebar.classList.toggle("closed");
+            mainContent.classList.toggle("closed");
+        });
+    </script>
+
+    <script>
+    const nombre = localStorage.getItem("usuarioNombre") || "";
+    const apellido = localStorage.getItem("usuarioApellido") || "";
+
+    const spanUsuario = document.getElementById("nombreUsuario");
+    const circulo = document.getElementById("circuloUsuario");
+
+    let nombreCompleto = nombre;
+    if (apellido) nombreCompleto += " " + apellido;
+    spanUsuario.textContent = nombreCompleto || "Usuario";
+
+    function obtenerIniciales(nombre, apellido) {
+        let iniciales = "";
+
+        if (nombre && apellido) {
+            iniciales = nombre.charAt(0) + apellido.charAt(0);
+        } else if (nombre) {
+            iniciales = nombre.substring(0, 2);
+        } else if (apellido) {
+            iniciales = apellido.substring(0, 2);
+        } else {
+            iniciales = "US";
+        }
+
+        return iniciales.toUpperCase();
+    }
+
+    circulo.textContent = obtenerIniciales(nombre, apellido);
+
+    document.getElementById("btnLogout").addEventListener("click", function () {
+        localStorage.removeItem("usuarioNombre");
+        localStorage.removeItem("usuarioApellido");
+        localStorage.removeItem("modo-oscuro");
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+    });
+    </script>
+</body>
+</html>          <div class="card"><canvas id="noiseChart"></canvas></div>
           <div class="card"><canvas id="lightChart"></canvas></div>
         </div>
     </div>
