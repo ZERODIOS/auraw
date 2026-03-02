@@ -5,9 +5,7 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Hace que el ancho del layout sea igual al ancho real del dispositivo -->
-
     <title>Registro</title>
-
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     
@@ -17,17 +15,11 @@
     <!-- Tu CSS -->
     <link rel="stylesheet" href="registroStyle.css">
 </head>
-
 <body class="register-bg">
-
     <div class="form-container">
-
         <h1 class="fw-bold mb-5">Crear cuenta</h1>
-
         <div id="errorBox"></div>
-
         <form id="registerForm">
-
             <div class="row g-3 mb-3">
                 <div class="col">
                     <div class="input-group-custom">
@@ -35,14 +27,12 @@
                         <i class="bi bi-person-vcard input-icon"></i>
                     </div>
                 </div>
-
                 <div class="col">
                     <div class="input-group-custom">
                         <input type="text" id="lastName" placeholder="Apellido Paterno">
                         <i class="bi bi-person-vcard input-icon"></i>
                     </div>
                 </div>
-
                 <div class="mb-3">
                     <div class="input-group-custom">
                         <input type="text" id="apellidoM" placeholder="Apellido Materno">
@@ -50,35 +40,27 @@
                     </div>
                 </div>
             </div>
-
             <div class="mb-3">
                 <div class="input-group-custom">
                     <input type="email" id="email" placeholder="Correo electrónico">
                     <i class="bi bi-envelope input-icon"></i>
                 </div>
             </div>
-
             <div class="mb-4">
                 <div class="input-group-custom">
                     <input type="password" id="password" placeholder="Contraseña">
                     <i class="bi bi-eye input-icon"></i>
                 </div>
             </div>
-
             <button class="btn btn-register w-100">Crear cuenta</button>
-
             <div class="mt-4 text-center">
                 <a href="login.html">¿Ya tienes una cuenta?</a>
             </div>
-
         </form>
-
     </div>
-
 <script>
     document.getElementById("registerForm").addEventListener("submit", async function(e){
         e.preventDefault();
-
         let nombre = document.getElementById("firstName").value.trim();
         let apellido = document.getElementById("lastName").value.trim();
         let apellidoM = document.getElementById("apellidoM").value.trim();
@@ -87,61 +69,48 @@
         let cajaError = document.getElementById("errorBox");
         cajaError.innerHTML = "";
         let rol = 1;
-
         function mostrarError(msg){
             cajaError.innerHTML = `<p class='error-text'>${msg}</p>`;
         }
-
         // VALIDACIONES
         const validarNombre = /^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/;
-
         if(nombre === "" || apellido === "" || correo === "" || contraseña === ""){
             mostrarError("Todos los campos son obligatorios.");
             return;
         }
-
         if(!validarNombre.test(nombre)){
             mostrarError("El nombre no puede contener números.");
             return;
         }
-
         if(!validarNombre.test(apellido)){
             mostrarError("El apellido no puede contener números.");
             return;
         }
-
         const validarCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if(!validarCorreo.test(correo)){
             mostrarError("Ingresa un correo válido.");
             return;
         }
-
         if(contraseña.length < 6){
             mostrarError("La contraseña debe tener mínimo 6 caracteres.");
             return;
         }
-
         if(!/[A-Z]/.test(contraseña)){
             mostrarError("La contraseña debe contener al menos una letra mayúscula.");
             return;
         }
-
         if(!/[0-9]/.test(contraseña)){
             mostrarError("La contraseña debe contener al menos un número.");
             return;
         }
-
         if(/\s/.test(contraseña)){
             mostrarError("La contraseña no puede contener espacios.");
             return;
         }
-
         // ================================
         // 🔥 AQUÍ SE HACE LA PETICIÓN A LA API
         // ================================
-
-        const apiURL = "http://auraa.ddns.net:8000/insertusuario";
-
+        const apiURL = "https://api-aura-204e.onrender.com/insertusuario";
         const data = {
             nombre: nombre,
             apellido_p: apellido,
@@ -150,7 +119,6 @@
             contra: contraseña,
             id_rol: rol
         };
-
         try {
             const respuesta = await fetch(apiURL, {
                 method: "POST",
@@ -159,30 +127,23 @@
                 },
                 body: JSON.stringify(data)
             });
-
             const resultado = await respuesta.json();
-
             // Si la API responde con error
             if(!respuesta.ok){
                 mostrarError(resultado.message || "Error en el registro.");
                 return;
             }
-
             // Si la API responde correctamente
             cajaError.innerHTML = `<p class='success-text'>Cuenta creada correctamente.</p>`;
-
             // Opcional: redirigir después de 2 segundos
             setTimeout(() => {
                 window.location.href = "login.html";
             }, 2000);
-
         } catch (error) {
             console.error("Error al conectar con la API:", error);
             mostrarError("No se pudo conectar con el servidor.");
         }
-
     });
 </script>
-
 </body>
 </html>
