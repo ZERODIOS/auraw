@@ -12,17 +12,14 @@
     <link rel="stylesheet" href="espaciosStyle.css">
 </head>
 <body>
-
     <div class="topbar d-flex justify-content-between">
         <div class="d-flex align-items-center gap-3">
             <i id="btnMenu" class="bi bi-list fs-2" style="cursor:pointer;"></i>
             <i class="bi bi-house-fill fs-3"></i>
             <span class="logo-aura">AURA</span>
         </div>
-
         <div class="d-flex align-items-center gap-4">
             <i class="bi bi-moon icon-darkmode" id="toggleDark"></i>
-
             <div class="d-flex align-items-center gap-2">
                 <div id="circuloUsuario" 
                     style="background:#6C7A89; color:white; border-radius:50%; width:46px; height:46px; display:flex; justify-content:center; align-items:center;">
@@ -33,67 +30,54 @@
             <i></i>
         </div>
     </div>
-
     <div class="sidebar">
-
     <div class="sidebar-menu">
         <a href="dashboard.html"><i class="bi bi-bar-chart-fill"></i> Dashboard</a>
         <a href="control_maual.html"><i class="bi bi-search"></i> Control Manual</a>
         <a class="active" href="gestion_espacios.html"><i class="bi bi-grid-3x3-gap-fill"></i> Espacios</a>
         <a href="historial_reportes.html"><i class="bi bi-clock-history"></i> Historial</a>
     </div>
-
     <button id="btnLogout" class="btn-logout">
         <i class="bi bi-box-arrow-right"></i> Cerrar sesión
     </button>
-
 </div>
-
     <div class="main-content">
-
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
             <h2 style="font-weight:700;">Gestión de espacios</h2>
             <button id="btnMostrarForm" class="btn btn-warning mt-2 mt-md-0"> + Agregar espacios</button>
         </div>
-
         <div id="formEspacio" style="display:none;" class="mt-4">
             <h3>Nuevo Espacio</h3>
             <input type="text" id="nombre" placeholder="Nombre del espacio" class="form-control mb-2">
             <input type="text" id="planta" placeholder="Planta" class="form-control mb-2">
             <input type="number" id="capacidad" placeholder="Capacidad" class="form-control mb-2">
             <input type="number" id="id_usuario" placeholder="ID del usuario encargado" class="form-control mb-3">
-
             <div class="mb-3">
     <label class="form-label"><strong>Sensores a utilizar:</strong></label>
-
     <div class="form-check mb-3">
         <input class="form-check-input sensor-check" type="checkbox" value="co2" id="sensorCo2">
         <label class="form-check-label" for="sensorCo2">
             Sensor de CO2
         </label>
     </div>
-
     <div class="form-check mb-3">
         <input class="form-check-input sensor-check" type="checkbox" value="luminosidad" id="sensorLuminosidad">
         <label class="form-check-label" for="sensorLuminosidad">
             Sensor de luminosidad
         </label>
     </div>
-
     <div class="form-check mb-3">
         <input class="form-check-input sensor-check" type="checkbox" value="polvo" id="sensorPolvo">
         <label class="form-check-label" for="sensorPolvo">
             Sensor de polvo
         </label>
     </div>
-
     <div class="form-check mb-3">
         <input class="form-check-input sensor-check" type="checkbox" value="temperatura_humedad" id="sensorTempHum">
         <label class="form-check-label" for="sensorTempHum">
             Sensor de temperatura y humedad
         </label>
     </div>
-
     <div class="form-check mb-4">
         <input class="form-check-input sensor-check" type="checkbox" value="ruido" id="sensorRuido">
         <label class="form-check-label" for="sensorRuido">
@@ -101,11 +85,9 @@
         </label>
     </div>
 </div>
-
             <button id="btnAgregar" class="btn btn-success mb-4">Guardar espacio</button>
             <div id="msg" class="mt-3"></div>
         </div>
-
         <div class="cards-container mt-4">
             
             <div class="space-card p-4 mb-4">
@@ -113,11 +95,9 @@
                     <h5 style="font-weight:600; margin:0;">Oficina A</h5>
                     <span class="status-tag text-white" style="background:#539453;">Activo</span>
                 </div>
-
                 <p class="m-0" style="font-size:14px; opacity:0.8;">
                     Planta: 2 | Capacidad: 8 personas
                 </p>
-
                 <div class="mt-3">
                     <p class="m-1"><strong>Sensores:</strong> <span>5 activos</span></p>
                     <p class="m-1"><strong>Dispositivos:</strong> <span>4 conectados</span></p>
@@ -126,7 +106,6 @@
                         <span class="estado-verde">Óptimo</span>
                     </p>
                 </div>
-
                 <div class="d-flex gap-3 mt-3">
                     <button class="btn btn-primary" style="padding:6px 14px; border-radius:8px;">
                         <i class="bi bi-pencil-square"></i> Editar
@@ -136,17 +115,14 @@
                     </button>
                 </div>
             </div>
-
             <div class="space-card p-4 mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h5 style="font-weight:600; margin:0;">Aula 1</h5>
                     <span class="status-tag text-white" style="background:#539453;">Activo</span>
                 </div>
-
                 <p class="m-0" style="font-size:14px; opacity:0.8;">
                     Planta: 1 | Capacidad: 30 personas
                 </p>
-
                 <div class="mt-3">
                     <p class="m-1"><strong>Sensores:</strong> 5 activos</p>
                     <p class="m-1"><strong>Dispositivos:</strong> 6 conectados</p>
@@ -155,22 +131,18 @@
                         <span class="estado-naranja">Regular</span>
                     </p>
                 </div>
-
                 <div class="d-flex gap-3 mt-3">
                     <button class="btn btn-primary" style="padding:6px 14px; border-radius:8px;">
                         <i class="bi bi-pencil-square"></i> Editar
                     </button>
                 </div>
             </div>
-
         </div> 
     </div>
-
     <script>
         (function () {
             const toggle = document.getElementById("toggleDark");
             if (!toggle) return;
-
             const isDark = localStorage.getItem("modo-oscuro") === "true";
             if (isDark) {
                 document.body.classList.add("dark");
@@ -178,11 +150,9 @@
             } else {
                 if (toggle.classList.contains('bi-sun')) toggle.classList.replace('bi-sun', 'bi-moon');
             }
-
             toggle.addEventListener('click', () => {
                 const nowDark = document.body.classList.toggle('dark');
                 localStorage.setItem('modo-oscuro', nowDark);
-
                 if (nowDark) {
                     if (toggle.classList.contains('bi-moon')) toggle.classList.replace('bi-moon', 'bi-sun');
                 } else {
@@ -190,46 +160,37 @@
                 }
             });
         })();
-
         const btnMenu = document.getElementById("btnMenu");
         const sidebar = document.querySelector(".sidebar");
         const mainContent = document.querySelector(".main-content");
-
         btnMenu.addEventListener("click", () => {
             sidebar.classList.toggle("closed");
             mainContent.classList.toggle("closed");
         });
     </script>
-
     <script>
         async function cargarEspacios() {
             const contenedor = document.querySelector(".cards-container");
             contenedor.innerHTML = "<p style='color:gray;'>Cargando espacios...</p>";
-
             try {
-                const respuesta = await fetch("http://auraa.ddns.net:8000/getespacios", {
+                const respuesta = await fetch("https://api-aura-204e.onrender.com/getespacios", {
                     method: "GET",
                     headers: { "Content-Type": "application/json" }
                 });
-
                 if (!respuesta.ok) {
                     contenedor.innerHTML = "<p style='color:red;'>Error al obtener espacios.</p>";
                     return;
                 }
-
                 const datos = await respuesta.json();
                 contenedor.innerHTML = "";
-
                 if (datos.length === 0) {
                     contenedor.innerHTML = "<p style='color:gray;'>No hay espacios registrados.</p>";
                     return;
                 }
-
                 datos.forEach(espacio => {
                     const card = document.createElement("div");
                     card.classList.add("space-card", "p-4", "mb-4");
                     // Eliminé la línea card.style.width = "420px"; que estaba aquí en el script
-
                     card.innerHTML = `
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 style="font-weight:600; margin:0;">${espacio.nombre}</h5>
@@ -253,17 +214,14 @@
                     `;
                     contenedor.appendChild(card);
                 });
-
             } catch (error) {
                 console.error("Error al cargar espacios:", error);
                 contenedor.innerHTML = "<p style='color:red;'>Error de conexión.</p>";
             }
         }
-
         function eliminarEspacio(id_espacio) {
             if (!confirm("¿Seguro que quieres eliminar este espacio?")) return;
-
-            fetch("http://auraa.ddns.net:8000/getespacio", {
+            fetch("https://api-aura-204e.onrender.com/getespacio", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id_espacio: id_espacio })
@@ -275,8 +233,7 @@
                 const planta = espacio.planta;
                 const capacidad = espacio.capacidad;
                 const id_usuario = espacio.id_usuario;
-
-                return fetch("http://auraa.ddns.net:8000/delespacio", {
+                return fetch("https://api-aura-204e.onrender.com/delespacio", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -298,21 +255,16 @@
                 alert("Error al intentar eliminar el espacio.");
             });
         }
-
         document.addEventListener("DOMContentLoaded", cargarEspacios);
     </script>
-
     <script>
         const nombre = localStorage.getItem("usuarioNombre") || "";
         const apellido = localStorage.getItem("usuarioApellido") || "";
-
         const spanUsuario = document.getElementById("nombreUsuario");
         const circulo = document.getElementById("circuloUsuario");
-
         let nombreCompleto = nombre;
         if (apellido) nombreCompleto += " " + apellido;
         spanUsuario.textContent = nombreCompleto || "Usuario";
-
         function obtenerIniciales(nombre, apellido) {
             let iniciales = "";
             if (nombre && apellido) {
@@ -326,26 +278,20 @@
             }
             return iniciales.toUpperCase();
         }
-
         circulo.textContent = obtenerIniciales(nombre, apellido);
     </script>
-
     <script>
         document.getElementById("btnMostrarForm").addEventListener("click", () => {
             document.getElementById("formEspacio").style.display = "block";
         });
-
         let editandoId = null;
 //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-
         document.getElementById("btnAgregar").addEventListener("click", function () {
-
     // Obtener sensores seleccionados
     const sensoresSeleccionados = [];
     document.querySelectorAll(".sensor-check:checked").forEach(sensor => {
         sensoresSeleccionados.push(sensor.value);
     });
-
     const payload = {
         nombre: document.getElementById("nombre").value,
         planta: document.getElementById("planta").value,
@@ -353,10 +299,9 @@
         id_usuario: document.getElementById("id_usuario").value,
         sensores: sensoresSeleccionados
     };
-
     if (editandoId === null) {
         // AGREGAR
-        fetch("http://auraa.ddns.net:8000/addespacio", {
+        fetch("https://api-aura-204e.onrender.com/addespacio", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(payload)
@@ -365,12 +310,10 @@
             limpiarFormulario();
             cargarEspacios();
         });
-
     } else {
         // EDITAR
         payload.id_espacio = editandoId;
-
-        fetch("http://auraa.ddns.net:8000/updateespacio", {
+        fetch("https://api-aura-204e.onrender.com/updateespacio", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(payload)
@@ -383,20 +326,18 @@
         });
     }
 });
-
 function limpiarFormulario() {
     document.getElementById("nombre").value = "";
     document.getElementById("planta").value = "";
     document.getElementById("capacidad").value = "";
     document.getElementById("id_usuario").value = "";
-
     document.querySelectorAll(".sensor-check").forEach(sensor => {
         sensor.checked = false;
     });
 }
 //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         function editarEspacio(id) {
-            fetch("http://auraa.ddns.net:8000/getespacio", {
+            fetch("https://api-aura-204e.onrender.com/getespacio", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({ id_espacio: id })
@@ -412,17 +353,13 @@ function limpiarFormulario() {
                 document.getElementById("btnAgregar").innerText = "Actualizar espacio";
             });
         }
-
         document.getElementById("btnLogout").addEventListener("click", function () {
-
     // Limpiar datos de sesión
     localStorage.removeItem("usuarioNombre");
     localStorage.removeItem("usuarioApellido");
     localStorage.removeItem("modo-oscuro");
-
     // Si manejas token:
     localStorage.removeItem("token");
-
     // Redirigir al login
     window.location.href = "login.html"; // Ajusta si tu login tiene otro nombre
 });
