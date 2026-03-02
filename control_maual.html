@@ -26,25 +26,20 @@
             <i class="bi bi-power text-danger fs-3"></i>
         </div>
     </div>
-
     <div class="sidebar">
-
     <div class="sidebar-menu">
         <a href="dashboard.html"><i class="bi bi-bar-chart-fill"></i> Dashboard</a>
         <a class="active" href="control_maual.html"><i class="bi bi-search"></i> Control Manual</a>
         <a href="gestion_espacios.html"><i class="bi bi-grid-3x3-gap-fill"></i> Espacios</a>
         <a href="historial_reportes.html"><i class="bi bi-clock-history"></i> Historial</a>
     </div>
-
     <button id="btnLogout" class="btn-logout">
         <i class="bi bi-box-arrow-right"></i> Cerrar sesión
     </button>
-
 </div>
     
     <div class="main-content">
         <h2 class="title-section mb-4">Control Manual</h2>
-
         <div class="card-device mb-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -59,7 +54,6 @@
                 </button>
             </div>
         </div>
-
         <div class="card-device mb-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -75,7 +69,6 @@
                 </div>
             </div>
         </div>
-
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="card-device" id="cardFoco">
@@ -94,7 +87,6 @@
                     <input type="range" class="form-range" id="rangoFoco" max="100" value="0">
                 </div>
             </div>
-
             <div class="col-md-6">
                 <div class="card-device" id="cardVentilador">
                     <div class="d-flex justify-content-between">
@@ -110,7 +102,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
                 <div class="card-device">
                     <div class="d-flex justify-content-between">
@@ -130,11 +121,9 @@
             </div>
         </div>
     </div>
-
     <script>
-    const API_BASE = "http://auraa.ddns.net:8000/api";
+    const API_BASE = "https://api-aura-204e.onrender.com/api";
     const DISPOSITIVO_ID = "ESP32_AURA_01";
-
     async function verificarConexion() {
         const status = document.getElementById('connectionStatus');
         const text = document.getElementById('connectionText');
@@ -168,7 +157,6 @@
             console.error('Error de conexión:', error);
         }
     }
-
     function actualizarModoUI(esAutomatico) {
         const cardFoco = document.getElementById('cardFoco');
         const cardVentilador = document.getElementById('cardVentilador');
@@ -181,7 +169,6 @@
             cardVentilador.classList.remove('disabled');
         }
     }
-
     // MODO DE OPERACIÓN
     document.getElementById('modoOperacion').addEventListener('change', async function() {
         const automatico = this.checked;
@@ -201,7 +188,6 @@
             this.checked = !this.checked;
         }
     });
-
     // VENTILADOR
     document.getElementById('switchVentilador').addEventListener('change', async function() {
         if (document.getElementById('modoOperacion').checked) {
@@ -227,7 +213,6 @@
             this.checked = !this.checked;
         }
     });
-
     // FOCO
     document.getElementById('switchFoco').addEventListener('change', async function() {
         if (document.getElementById('modoOperacion').checked) {
@@ -253,7 +238,6 @@
             this.checked = !this.checked;
         }
     });
-
     // INTENSIDAD FOCO
     const rangoFoco = document.getElementById('rangoFoco');
     const valorFoco = document.getElementById('valorFoco');
@@ -282,7 +266,6 @@
             console.error('Error:', error);
         }
     });
-
     // RUIDO BLANCO (Bocina)
     const switchSonido = document.getElementById('switchSonido');
     const rangoSonido = document.getElementById('rangoSonido');
@@ -313,7 +296,6 @@
             console.error('Error:', error);
         }
     });
-
     // MODO OSCURO
     (function () {
         const toggle = document.getElementById("toggleDark");
@@ -332,29 +314,23 @@
             toggle.classList.toggle('bi-sun');
         });
     })();
-
     // MENÚ
     document.getElementById("btnMenu").addEventListener("click", () => {
         document.querySelector(".sidebar").classList.toggle("closed");
         document.querySelector(".main-content").classList.toggle("closed");
     });
-
     // INICIALIZACIÓN
     window.addEventListener('load', () => {
         verificarConexion();
         setInterval(verificarConexion, 10000);
     });
-
     document.getElementById("btnLogout").addEventListener("click", function () {
-
     // Limpiar datos de sesión
     localStorage.removeItem("usuarioNombre");
     localStorage.removeItem("usuarioApellido");
     localStorage.removeItem("modo-oscuro");
-
     // Si manejas token:
     localStorage.removeItem("token");
-
     // Redirigir al login
     window.location.href = "login.html"; // Ajusta si tu login tiene otro nombre
 });
