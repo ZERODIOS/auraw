@@ -1,117 +1,93 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    
-    <!-- Tu CSS -->
-    <link rel="stylesheet" href="loginStyle.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Tu CSS -->
+    <link rel="stylesheet" href="loginStyle.css">
 </head>
-
 <body class="auth-bg">
-
 <div class="login-wrapper d-flex flex-column flex-md-row">
-
-    <div class="left-section col-12 col-md-6 d-flex flex-column justify-content-center">
-        <div class="form-container">
-
-            <h1 class="mb-4 login-title">Iniciar Sesión</h1>
-
-            <div id="errorBox"></div>
-
-            <form id="loginForm">
-
-                <label class="mb-2">Correo electrónico</label>
-                <div class="position-relative mb-4">
-                    <i class="bi bi-envelope input-icon"></i>
-                    <!-- CAMBIADO A TEXT PARA PODER USAR 1 -->
-                    <input type="text" id="email" class="form-control input-custom">
-                </div>
-
-                <label class="mb-2">Contraseña</label>
-                <div class="position-relative mb-4">
-                    <i class="bi bi-lock input-icon"></i>
-                    <input type="password" id="password" class="form-control input-custom">
-                </div>
-
-                <a href="restablecer_contra.html" class="forgot-link">
-                    ¿Olvidaste tu contraseña?
-                </a>
-
-                <button type="submit" class="btn-login mt-4">
-                    Inicia sesión
-                </button>
-
-                <p class="mt-4">
-                    ¿No tienes cuenta?
-                    <a href="registro.html" class="register-link">Crear cuenta</a>
-                </p>
-
-            </form>
-
-        </div>
-    </div>
-
-    <div class="right-section col-12 col-md-6"></div>
-
+    <div class="left-section col-12 col-md-6 d-flex flex-column justify-content-center">
+        <div class="form-container">
+            <h1 class="mb-4 login-title">Iniciar Sesión</h1>
+            <div id="errorBox"></div>
+            <form id="loginForm">
+                <label class="mb-2">Correo electrónico</label>
+                <div class="position-relative mb-4">
+                    <i class="bi bi-envelope input-icon"></i>
+                    <!-- CAMBIADO A TEXT PARA PODER USAR 1 -->
+                    <input type="text" id="email" class="form-control input-custom">
+                </div>
+                <label class="mb-2">Contraseña</label>
+                <div class="position-relative mb-4">
+                    <i class="bi bi-lock input-icon"></i>
+                    <input type="password" id="password" class="form-control input-custom">
+                </div>
+                <a href="restablecer_contra.html" class="forgot-link">
+                    ¿Olvidaste tu contraseña?
+                </a>
+                <button type="submit" class="btn-login mt-4">
+                    Inicia sesión
+                </button>
+                <p class="mt-4">
+                    ¿No tienes cuenta?
+                    <a href="registro.html" class="register-link">Crear cuenta</a>
+                </p>
+            </form>
+        </div>
+    </div>
+    <div class="right-section col-12 col-md-6"></div>
 </div>
-
 <script>
 document.getElementById("loginForm").addEventListener("submit", function(e){
-    e.preventDefault();
-
-    let correo = document.getElementById("email").value.trim();
-    let contraseña = document.getElementById("password").value.trim();
-    let cajaError = document.getElementById("errorBox");
-
-    cajaError.innerHTML = "";
-
-    if(correo === "" || contraseña === ""){
-        cajaError.innerHTML = "<p class='error-text'>Llena todos los campos.</p>";
-        return;
-    }
-
-    // LOGIN DE PRUEBA 1 / 1
-    if(correo === "1" && contraseña === "1"){
-        localStorage.setItem("usuarioNombre", "Prueba");
-        localStorage.setItem("usuarioApellidoP", "Admin");
-        localStorage.setItem("usuarioApellidoM", "Test");
-        localStorage.setItem("usuarioRol", "1");
-        window.location.href = "dashboard.html";
-        return;
-    }
-
-    // LOGIN REAL POR API
-    fetch("http://auraa.ddns.net:8000/getusuarios")
-    .then(response => response.json())
-    .then(lista => {
-        const usuarioEncontrado = lista.find(u => 
-            u.correo === correo && u.contra === contraseña
-        );
-
-        if (usuarioEncontrado) {
-            localStorage.setItem("usuarioNombre", usuarioEncontrado.nombre);
-            localStorage.setItem("usuarioApellidoP", usuarioEncontrado.apellido_p);
-            localStorage.setItem("usuarioApellidoM", usuarioEncontrado.apellido_m);
-            localStorage.setItem("usuarioRol", usuarioEncontrado.id_rol);
-            localStorage.setItem("user", JSON.stringify(usuarioEncontrado));
-            window.location.href = "dashboard.html";
-        } else {
-            cajaError.innerHTML = "<p class='error-text'>Correo o contraseña incorrectos.</p>";
-        }
-    })
-    .catch(error => {
-        cajaError.innerHTML = "<p class='error-text'>Error al conectar con el servidor.</p>";
-    });
+    e.preventDefault();
+    let correo = document.getElementById("email").value.trim();
+    let contraseña = document.getElementById("password").value.trim();
+    let cajaError = document.getElementById("errorBox");
+    cajaError.innerHTML = "";
+    if(correo === "" || contraseña === ""){
+        cajaError.innerHTML = "<p class='error-text'>Llena todos los campos.</p>";
+        return;
+    }
+    // LOGIN DE PRUEBA 1 / 1
+    if(correo === "1" && contraseña === "1"){
+        localStorage.setItem("usuarioNombre", "Prueba");
+        localStorage.setItem("usuarioApellidoP", "Admin");
+        localStorage.setItem("usuarioApellidoM", "Test");
+        localStorage.setItem("usuarioRol", "1");
+        window.location.href = "dashboard.html";
+        return;
+    }
+    // LOGIN REAL POR API
+    fetch("https://api-aura-204e.onrender.com/getusuarios")
+    .then(response => response.json())
+    .then(lista => {
+        const usuarioEncontrado = lista.find(u => 
+            u.correo === correo && u.contra === contraseña
+        );
+        if (usuarioEncontrado) {
+            localStorage.setItem("usuarioNombre", usuarioEncontrado.nombre);
+            localStorage.setItem("usuarioApellidoP", usuarioEncontrado.apellido_p);
+            localStorage.setItem("usuarioApellidoM", usuarioEncontrado.apellido_m);
+            localStorage.setItem("usuarioRol", usuarioEncontrado.id_rol);
+            localStorage.setItem("user", JSON.stringify(usuarioEncontrado));
+            window.location.href = "dashboard.html";
+        } else {
+            cajaError.innerHTML = "<p class='error-text'>Correo o contraseña incorrectos.</p>";
+        }
+    })
+    .catch(error => {
+        cajaError.innerHTML = "<p class='error-text'>Error al conectar con el servidor.</p>";
+    });
 });
 </script>
-
 </body>
 </html>
