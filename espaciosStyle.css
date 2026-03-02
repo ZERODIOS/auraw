@@ -1,0 +1,109 @@
+:root {
+    --gold-light: #FFF3D2;
+    --gold-dark: #C9962D;
+    --gold-darkmode-bg: #332b18;
+    --gold-darkmode-text: #e3c27d;
+}
+
+body { background-color: #f5f5f5; transition: .3s; font-family: "Poppins", sans-serif; margin: 0; }
+body.dark, body.dark-mode { background-color: #111 !important; color: #eee; }
+
+/* TOPBAR Y SIDEBAR IGUALES AL BASE */
+.topbar { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: white; padding: 0 30px; align-items: center; border-bottom: 1px solid #ddd; z-index: 1200; transition: .3s; }
+body.dark .topbar, body.dark-mode .topbar { background: #1a1a1a; border-bottom: 1px solid #333; }
+.logo-aura { font-size: 22px; font-weight: 700; color: var(--gold-dark); cursor: pointer; }
+.icon-darkmode { font-size: 20px; cursor: pointer; color: #555; }
+body.dark .icon-darkmode, body.dark-mode .icon-darkmode { color: var(--gold-darkmode-text); }
+#btnMenu { color: #555; cursor: pointer; }
+
+.sidebar { width: 260px; background: white; position: fixed; top: 70px; left: 0; bottom: 0; border-right: 1px solid #ddd; padding-top: 35px; transition: .3s ease; z-index: 1100; }
+body.dark .sidebar, body.dark-mode .sidebar { background: #1a1a1a; border-right: 1px solid #333; }
+.sidebar a { color: #808080; font-size: 18px; padding: 15px 25px; display: flex; align-items: center; gap: 12px; text-decoration: none; border-radius: 10px; margin: 5px 15px; transition: .3s; }
+.sidebar a:hover { background: var(--gold-light) !important; color: var(--gold-dark) !important; }
+body.dark .sidebar a:hover, body.dark-mode .sidebar a:hover { background: var(--gold-darkmode-bg) !important; color: var(--gold-darkmode-text) !important; }
+.sidebar a.active { background: var(--gold-light) !important; font-weight: 600; color: var(--gold-dark) !important; }
+body.dark .sidebar a.active, body.dark-mode .sidebar a.active { background: var(--gold-darkmode-bg) !important; color: var(--gold-darkmode-text) !important; }
+
+.sidebar.closed { left: -260px; }
+.main-content { margin-left: 260px; padding: 100px 40px; transition: .3s ease; }
+.main-content.closed { margin-left: 0 !important; }
+
+/* TARJETAS DE ESPACIOS (AHORA RESPONSIVAS) */
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.space-card {
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+    width: 100%; /* Ocupa el 100% de su espacio disponible... */
+    max-width: 400px; /* ...pero nunca crece más de 400px */
+}
+
+body.dark .space-card, body.dark-mode .space-card { background: #1a1a1a; box-shadow: 0 2px 10px rgba(255,255,255,0.05); color: #e6e6e6; }
+body.dark .space-card p, body.dark .space-card h5, body.dark-mode .space-card p, body.dark-mode .space-card h5 { color: #e6e6e6 !important; }
+.space-card .status-tag { background: #D9D9D9; color: #333; padding: 5px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; }
+body.dark .space-card .status-tag, body.dark-mode .space-card .status-tag { background: #333; color: #eee; }
+.space-card .estado-verde { color: green; font-weight: 600; }
+.space-card .estado-naranja { color: #E67E22; font-weight: 600; }
+body.dark .space-card .estado-verde, body.dark-mode .space-card .estado-verde { color: #7DFF7D !important; }
+body.dark .space-card .estado-naranja, body.dark-mode .space-card .estado-naranja { color: #FFB266 !important; }
+
+/* MEDIA QUERIES */
+@media (max-width: 1024px) {
+    .sidebar { width: 220px; }
+    .main-content { margin-left: 220px; padding: 100px 25px; }
+}
+
+@media (max-width: 768px) {
+    .sidebar { left: -260px; } 
+    .sidebar.closed { left: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.5); }
+    .main-content { margin-left: 0 !important; padding: 90px 20px; }
+    .main-content.closed { margin-left: 0 !important; }
+    
+    /* En móvil, los botones de arriba (Agregar espacio) se pueden apilar */
+    .d-flex.justify-content-between.align-items-center.mb-4 {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .topbar { padding: 0 15px; }
+    .logo-aura { font-size: 18px; }
+    .main-content { padding: 80px 15px; }
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px); /* resta altura del topbar */
+    padding: 20px 10px;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-logout {
+    margin-top: auto;  /* empuja solo el botón */
+    padding: 12px;
+    background: #F8D7DA;
+    border: none;
+    color: #C0392B;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+}
+
+.btn-logout:hover {
+    background: #f1b0b7;
+}

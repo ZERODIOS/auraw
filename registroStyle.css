@@ -1,0 +1,111 @@
+/* Fondo principal del registro */
+body.register-bg {
+    margin: 0; /* elimina margen por defecto */
+    padding: 0; /* elimina padding por defecto */
+    min-height: 100vh; /* altura mínima del viewport */
+    color: white; /* texto blanco */
+    background: url("registro.png") no-repeat center center fixed; /* imagen centrada fija */
+    background-size: cover; /* cubre toda la pantalla */
+    display: flex; /* activa flexbox */
+    justify-content: center; /* centra horizontalmente */
+    align-items: center; /* centra verticalmente */
+}
+
+/* Contenedor del formulario */
+.register-bg .form-container {
+    width: 100%; /* ocupa todo el ancho disponible */
+    max-width: 420px; /* pero no más de 420px en escritorio */
+    padding: 2rem; /* espacio interno proporcional */
+}
+
+/* Grupo de input personalizado */
+.register-bg .input-group-custom {
+    background: rgba(31, 31, 31, 0.85); /* fondo oscuro semitransparente */
+    border-radius: 12px; /* bordes redondeados */
+    padding: 0.8rem 1rem; /* padding adaptable */
+    display: flex; /* flex para alinear icono e input */
+    justify-content: space-between; /* separa input e icono */
+    align-items: center; /* centra verticalmente */
+}
+
+/* Input interno */
+.register-bg .input-group-custom input {
+    background: transparent; /* sin fondo */
+    border: none; /* sin borde */
+    color: white; /* texto blanco */
+    width: 100%; /* ocupa todo el espacio */
+    font-size: 1rem; /* tamaño relativo */
+    outline: none; /* elimina borde azul */
+}
+
+/* Estado focus */
+.register-bg .input-group-custom input:focus {
+    box-shadow: none; /* elimina sombra bootstrap */
+    color: white;
+}
+
+/* Iconos */
+.register-bg .input-icon {
+    color: #d1d1d1; /* color gris */
+    font-size: 1.2rem; /* tamaño relativo */
+    margin-left: 10px; /* separación */
+}
+
+/* Botón */
+.register-bg .btn-register {
+    background-color: #E0A437; /* color dorado */
+    border: none; /* sin borde */
+    color: black; /* texto negro */
+    font-weight: 600; /* grosor medio */
+    padding: 0.8rem; /* altura adaptable */
+    transition: 0.3s ease; /* animación suave */
+}
+
+/* Hover */
+.register-bg .btn-register:hover {
+    background-color: #c38c2f;
+}
+
+/* Mensajes */
+.register-bg .error-text,
+.register-bg .success-text {
+    font-size: 0.9rem; /* tamaño relativo */
+    margin-top: 5px;
+}
+
+.register-bg .error-text { color: #ff6b6b; }
+.register-bg .success-text { color: #4CAF50; }
+
+/* Links */
+.register-bg a {
+    color: #ddd;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+.register-bg a:hover {
+    color: #fff;
+}
+
+/* ========================= */
+/* AJUSTES SOLO PARA MOVIL  */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+    body.register-bg {
+        align-items: flex-start; /* evita que quede demasiado centrado */
+        padding-top: 40px; /* espacio arriba */
+    }
+
+    .register-bg .form-container {
+        padding: 1.5rem; /* menos padding en móvil */
+    }
+
+    .register-bg h1 {
+        font-size: 1.6rem; /* título más pequeño */
+        text-align: center;
+    }
+
+}
+

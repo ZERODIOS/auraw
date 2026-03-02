@@ -1,0 +1,122 @@
+/* ===== FONDO GENERAL ===== */
+
+.auth-bg {
+    background-color: #1c1c1c; /* Fondo oscuro general */
+    min-height: 100vh; /* Altura completa de pantalla */
+}
+
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+
+.login-wrapper {
+    min-height: 100vh; /* Ocupa toda la pantalla */
+}
+
+
+/* ===== SECCIÓN IZQUIERDA ===== */
+
+.left-section {
+    padding: 60px; /* Espaciado interno */
+    color: white; /* Texto blanco */
+}
+
+
+/* Contenedor interno del formulario */
+.form-container {
+    width: 100%; /* Ocupa todo el ancho disponible */
+    max-width: 400px; /* Limita el ancho máximo */
+}
+
+
+/* Título */
+.login-title {
+    font-size: 45px; /* Tamaño grande en desktop */
+    font-weight: 600; /* Grosor */
+}
+
+
+/* ===== INPUTS ===== */
+
+.input-custom {
+    padding-left: 40px; /* Espacio para el icono */
+    height: 45px; /* Altura cómoda para móvil */
+}
+
+
+/* Iconos dentro del input */
+.input-icon {
+    position: absolute; /* Posición absoluta */
+    left: 10px; /* Separación izquierda */
+    top: 50%; /* Centrado vertical */
+    transform: translateY(-50%); /* Ajuste exacto centro */
+    color: gray; /* Color del icono */
+}
+
+
+/* ===== BOTÓN ===== */
+
+.btn-login {
+    width: 100%; /* Ocupa todo el ancho */
+    background-color: #d4a437; /* Color dorado */
+    border: none; /* Sin borde */
+    padding: 12px; /* Espaciado interno */
+    color: black; /* Texto negro */
+    font-weight: 600; /* Negrita */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+
+/* ===== LINKS ===== */
+
+.forgot-link {
+    color: white; /* Blanco */
+    text-decoration: none; /* Sin subrayado */
+}
+
+.register-link {
+    color: #d4a437; /* Dorado */
+    text-decoration: none;
+}
+
+
+/* ===== SECCIÓN DERECHA (IMAGEN) ===== */
+
+.right-section {
+    background-image: url("login.png"); /* Imagen decorativa */
+    background-size: cover; /* Ajusta sin deformar */
+    background-position: center; /* Centra imagen */
+}
+
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+
+    .login-wrapper {
+        flex-direction: column;        /* Apila imagen y formulario */
+        justify-content: center;       /* Centra verticalmente dentro del viewport */
+        align-items: center;           /* Centra horizontalmente */
+        min-height: 100vh;             /* Asegura altura completa */
+    }
+
+    .right-section {
+        order: -1;                     /* Imagen primero */
+        width: 100%;                   /* Ocupa todo el ancho */
+        max-width: 500px;              /* Evita que se vea exagerada */
+        height: 250px;                 /* Altura controlada */
+    }
+
+    .left-section {
+        width: 100%;                   /* Ocupa ancho completo */
+        max-width: 500px;              /* Limita ancho del formulario */
+        padding: 30px;                 /* Espaciado interno */
+        display: flex;                 /* Activa flex interno */
+        justify-content: center;       /* Centra horizontalmente */
+    }
+}
+
+.register-bg .form-container {
+    backdrop-filter: blur(10px);
+    background: rgba(0,0,0,0.4);
+    border-radius: 16px;
+}

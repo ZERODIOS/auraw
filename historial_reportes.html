@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA — Historial y Reportes</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="aurastyle.css">
+    <link rel="stylesheet" href="historialStyle.css">
+</head>
+
+<body>
+    <div class="topbar d-flex justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <i id="btnMenu" class="bi bi-list fs-2" style="cursor:pointer;"></i>
+            <i class="bi bi-house-fill fs-3"></i>
+            <span class="logo-aura">AURA</span>
+        </div>
+
+        <div class="d-flex align-items-center gap-4">
+            <i class="bi bi-moon icon-darkmode" id="toggleDark"></i>
+
+            <div class="d-flex align-items-center gap-2">
+                <div id="circuloUsuario" style="background:#6C7A89; color:white; border-radius:50%; width:46px; height:46px; display:flex; justify-content:center; align-items:center;">
+                    US
+                </div>
+                <span id="nombreUsuario">Usuario</span>
+            </div>
+            <i></i>
+        </div>
+    </div>
+
+    <div class="sidebar">
+
+    <div class="sidebar-menu">
+        <a href="dashboard.html"><i class="bi bi-bar-chart-fill"></i> Dashboard</a>
+        <a href="control_maual.html"><i class="bi bi-search"></i> Control Manual</a>
+        <a  href="gestion_espacios.html"><i class="bi bi-grid-3x3-gap-fill"></i> Espacios</a>
+        <a class="active" href="historial_reportes.html"><i class="bi bi-clock-history"></i> Historial</a>
+    </div>
+
+    <button id="btnLogout" class="btn-logout">
+        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+    </button>
+
+</div>
+
+    <div class="main-content">
+        <div class="card-panel">
+            <h1 class="mb-4" style="font-weight:700;">Historial y Reportes</h1>
+
+            <div class="filters-row">
+                <div class="filter-box">
+                    <label>Tipo de sensor:</label>
+                    <select>
+                        <option>Todos</option>
+                        <option>Temperatura</option>
+                        <option>CO2</option>
+                        <option>Ruido</option>
+                    </select>
+                </div>
+
+                <div class="filter-box">
+                    <label>Fecha inicio:</label>
+                    <input type="date">
+                </div>
+
+                <div class="filter-box">
+                    <label>Fecha fin:</label>
+                    <input type="date">
+                </div>
+
+                <button class="btn btn-primary" style="border-radius:14px; height:38px;">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+            </div>
+
+            <div class="mb-3">
+                <button class="btn btn-success me-2">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> CSV
+                </button>
+                <button class="btn btn-danger">
+                    <i class="bi bi-file-earmark-pdf"></i> PDF
+                </button>
+            </div>
+
+            <div class="tabla-dark">
+                <table class="tabla-oscura">
+                    <thead>
+                        <tr>
+                            <th>FECHA</th>
+                            <th>HORA</th>
+                            <th>SENSOR</th>
+                            <th>VALOR</th>
+                            <th>ESTADO</th>
+                            <th>ESPACIO</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaHistorial">
+                        <tr><td colspan="6" style="text-align:center; opacity:0.7;">Cargando datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const toggle = document.getElementById("toggleDark");
+            if (!toggle) return;
+
+            const isDark = localStorage.getItem("modo-oscuro") === "true";
+            if (isDark) {
+                document.body.classList.add("dark");
+                if (toggle.classList.contains('bi-moon')) toggle.classList.replace('bi-moon', 'bi-sun');
+            } else {
+                if (toggle.classList.contains('bi-sun')) toggle.classList.replace('bi-sun', 'bi-moon');
+            }
+
+            toggle.addEventListener('click', () => {
+                const nowDark = document.body.classList.toggle('dark');
+                localStorage.setItem('modo-oscuro', nowDark);
+
+                if (nowDark) {
+                    if (toggle.classList.contains('bi-moon')) toggle.classList.replace('bi-moon', 'bi-sun');
+                } else {
+                    if (toggle.classList.contains('bi-sun')) toggle.classList.replace('bi-sun', 'bi-moon');
+                }
+            });
+        })();
+
+        const btnMenu = document.getElementById("btnMenu");
+        const sidebar = document.querySelector(".sidebar");
+        const mainContent = document.querySelector(".main-content");
+
+        btnMenu.addEventListener("click", () => {
+            sidebar.classList.toggle("closed");
+            mainContent.classList.toggle("closed");
+        });
+    </script>
+
+    <script>
+        let medicionesOriginales = [];
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await cargarHistorial();
+            conectarBotonFiltrar();
+            conectarBotonCSV();
+            conectarBotonPDF();
+        });
+
+        async function cargarHistorial() {
+            const tabla = document.getElementById("tablaHistorial");
+            tabla.innerHTML = `<tr><td colspan="6" style="text-align:center;">Cargando...</td></tr>`;
+
+            try {
+                const resp = await fetch("http://auraa.ddns.net:8000/getmediciones");
+                const datos = await resp.json();
+                medicionesOriginales = datos;
+                mostrarHistorial(datos);
+            } catch (err) {
+                tabla.innerHTML = `<tr><td colspan="6" style="color:red;">Error al conectar.</td></tr>`;
+            }
+        }
+
+        function mostrarHistorial(lista) {
+            const tabla = document.getElementById("tablaHistorial");
+            tabla.innerHTML = "";
+
+            if (!Array.isArray(lista) || lista.length === 0) {
+                tabla.innerHTML = `<tr><td colspan="6" style="text-align:center; opacity:0.7;">No hay mediciones disponibles.</td></tr>`;
+                return;
+            }
+
+            lista.forEach(med => {
+                const { fecha, hora } = formatearFechaYHora(med.fecha_hora);
+
+                function agregar(sensor, valor, unidad, estado) {
+                    const fila = document.createElement("tr");
+                    fila.innerHTML = `
+                        <td>${fecha}</td>
+                        <td>${hora}</td>
+                        <td>${sensor}</td>
+                        <td>${valor} ${unidad}</td>
+                        <td>${estado}</td>
+                        <td>${med.id_espacio}</td>
+                    `;
+                    tabla.appendChild(fila);
+                }
+
+                if (med.temperatura != null) {
+                    agregar("Temperatura", med.temperatura, "°C", med.temperatura < 18 ? "Frío" : med.temperatura <= 26 ? "Óptimo" : "Calor");
+                }
+                if (med.humedad != null) {
+                    agregar("Humedad", med.humedad, "%", med.humedad < 30 ? "Baja" : med.humedad <= 60 ? "Óptima" : "Alta");
+                }
+                if (med.co2 != null) {
+                    agregar("CO2", med.co2, "ppm", med.co2 < 700 ? "Excelente" : med.co2 <= 1000 ? "Regular" : "Malo");
+                }
+                if (med.particulas != null) {
+                    agregar("Partículas", med.particulas, "µg/m³", med.particulas < 12 ? "Bueno" : med.particulas <= 35 ? "Moderado" : "Malo");
+                }
+                if (med.ruido != null) {
+                    agregar("Ruido", med.ruido, "dB", med.ruido < 50 ? "Normal" : med.ruido <= 70 ? "Alto" : "Peligroso");
+                }
+                if (med.iluminacion != null) {
+                    agregar("Iluminación", med.iluminacion, "lx", med.iluminacion < 100 ? "Baja" : med.iluminacion <= 500 ? "Adecuada" : "Muy alta");
+                }
+            });
+        }
+
+        function formatearFechaYHora(fechaISO) {
+            const f = new Date(fechaISO);
+            return {
+                fecha: f.toLocaleDateString("es-MX", { day: "2-digit", month: "2-digit", year: "numeric" }),
+                hora: f.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: false })
+            };
+        }
+
+        function conectarBotonFiltrar() {
+            const btn = document.querySelector(".btn.btn-primary");
+            btn.addEventListener("click", aplicarFiltros);
+        }
+
+        function aplicarFiltros() {
+            const sensorSel = document.querySelector(".filter-box select").value;
+            const inputsFechas = document.querySelectorAll(".filter-box input");
+            const fechaIni = inputsFechas[0].value;
+            const fechaFin = inputsFechas[1].value;
+
+            let filtrados = [...medicionesOriginales];
+
+            if (sensorSel !== "Todos") {
+                filtrados = filtrados.filter(med =>
+                    (sensorSel === "Temperatura" && med.temperatura != null) ||
+                    (sensorSel === "CO2" && med.co2 != null) ||
+                    (sensorSel === "Ruido" && med.ruido != null)
+                );
+            }
+
+            if (fechaIni) {
+                filtrados = filtrados.filter(med => med.fecha_hora >= fechaIni);
+            }
+            if (fechaFin) {
+                filtrados = filtrados.filter(med => med.fecha_hora <= fechaFin + "T23:59:59");
+            }
+
+            mostrarHistorial(filtrados);
+        }
+
+        function conectarBotonCSV() {
+            const btnCSV = document.querySelector(".btn-success");
+            if (btnCSV) btnCSV.addEventListener("click", exportarCSV);
+        }
+
+        function exportarCSV() {
+            const filas = document.querySelectorAll("#tablaHistorial tr");
+            if (filas.length === 0 || filas[0].textContent.includes("Cargando") || filas[0].textContent.includes("No hay mediciones")) {
+                alert("No hay datos para exportar.");
+                return;
+            }
+
+            let csv = "FECHA,HORA,SENSOR,VALOR,ESTADO,ESPACIO\n";
+            filas.forEach(tr => {
+                const tds = tr.querySelectorAll("td");
+                if (tds.length === 6) {
+                    csv += Array.from(tds).map(td => td.textContent.trim()).join(",") + "\n";
+                }
+            });
+
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "historial.csv";
+            link.click();
+        }
+
+        function conectarBotonPDF() {
+            const btnPDF = document.querySelector(".btn-danger");
+            if (btnPDF) btnPDF.addEventListener("click", exportarPDF);
+        }
+
+        function exportarPDF() {
+            const filas = document.querySelectorAll("#tablaHistorial tr");
+            if (filas.length === 0 || filas[0].textContent.includes("Cargando") || filas[0].textContent.includes("No hay mediciones")) {
+                alert("No hay datos para exportar.");
+                return;
+            }
+
+            let html = `
+                <html>
+                <head>
+                    <title>Historial AURA</title>
+                    <style>
+                        body { font-family: Arial; padding: 20px; }
+                        h2 { text-align: center; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { border: 1px solid #444; padding: 6px; font-size: 12px; }
+                        th { background: #ddd; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Historial de Mediciones AURA</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>FECHA</th><th>HORA</th><th>SENSOR</th><th>VALOR</th><th>ESTADO</th><th>ESPACIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            filas.forEach(tr => {
+                const tds = tr.querySelectorAll("td");
+                if (tds.length === 6) {
+                    html += `<tr>${Array.from(tds).map(td => `<td>${td.textContent}</td>`).join('')}</tr>`;
+                }
+            });
+
+            html += `</tbody></table></body></html>`;
+
+            const ventana = window.open("", "_blank");
+            ventana.document.write(html);
+            ventana.document.close();
+            ventana.print();
+        }
+    </script>
+
+    <script>
+        const nombre = localStorage.getItem("usuarioNombre") || "";
+        const apellido = localStorage.getItem("usuarioApellido") || "";
+
+        const spanUsuario = document.getElementById("nombreUsuario");
+        const circulo = document.getElementById("circuloUsuario");
+
+        let nombreCompleto = nombre;
+        if (apellido) nombreCompleto += " " + apellido;
+        spanUsuario.textContent = nombreCompleto || "Usuario";
+
+        function obtenerIniciales(nombre, apellido) {
+            if (nombre && apellido) return nombre.charAt(0) + apellido.charAt(0);
+            if (nombre) return nombre.substring(0, 2);
+            if (apellido) return apellido.substring(0, 2);
+            return "US";
+        }
+        circulo.textContent = obtenerIniciales(nombre, apellido).toUpperCase();
+
+        document.getElementById("btnLogout").addEventListener("click", function () {
+
+    // Limpiar datos de sesión
+    localStorage.removeItem("usuarioNombre");
+    localStorage.removeItem("usuarioApellido");
+    localStorage.removeItem("modo-oscuro");
+
+    // Si manejas token:
+    localStorage.removeItem("token");
+
+    // Redirigir al login
+    window.location.href = "login.html"; // Ajusta si tu login tiene otro nombre
+});
+    </script>
+</body>
+</html>

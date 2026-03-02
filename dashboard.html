@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Sensores</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <link rel="stylesheet" href="aurastyle.css">
+  <link rel="stylesheet" href="dashboardStyle.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="topbar d-flex justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <i id="btnMenu" class="bi bi-list fs-2" style="cursor:pointer;"></i>
+            <i class="bi bi-house-fill fs-3"></i>
+            <span class="logo-aura">AURA</span>
+        </div>
+
+        <div class="d-flex align-items-center gap-4">
+            <i id="toggleDark" class="bi bi-moon icon-darkmode"></i>
+
+            <div class="d-flex align-items-center gap-2">
+                <div id="circuloUsuario" 
+                    style="background:#6C7A89; color:white; border-radius:50%; width:46px; height:46px; display:flex; justify-content:center; align-items:center;">
+                    US
+                </div>
+                <span id="nombreUsuario">Usuario</span>
+            </div>
+            <i></i>
+        </div>
+    </div>
+
+    <div class="sidebar">
+
+    <div class="sidebar-menu">
+        <a class="active" href="dashboard.html"><i class="bi bi-bar-chart-fill"></i> Dashboard</a>
+        <a href="control_maual.html"><i class="bi bi-search"></i> Control Manual</a>
+        <a href="gestion_espacios.html"><i class="bi bi-grid-3x3-gap-fill"></i> Espacios</a>
+        <a href="historial_reportes.html"><i class="bi bi-clock-history"></i> Historial</a>
+    </div>
+
+    <button id="btnLogout" class="btn-logout">
+        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+    </button>
+
+</div>
+    
+    <div class="main-content">
+        <h2 class="title-section mb-4">DASHBOARD</h2>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="status"></div>
+            <div class="icon">🌡️</div>
+            <div class="label">Temperatura</div>
+            <div class="value" id="tempValue">--°C</div>
+            <div class="range">Rango: 18-26°C</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="status"></div>
+            <div class="icon">☁️</div>
+            <div class="label">CO₂</div>
+            <div class="value" id="co2Value">-- ppm</div>
+            <div class="range">Límite: 1000 ppm</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="status"></div>
+            <div class="icon">🔊</div>
+            <div class="label">Ruido</div>
+            <div class="value" id="noiseValue">-- dB</div>
+            <div class="range">Límite: 70 dB</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="status"></div>
+            <div class="icon">💡</div>
+            <div class="label">Iluminación</div>
+            <div class="value" id="lightValue">-- lux</div>
+            <div class="range">Rango: 300-500 lux</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="status"></div>
+            <div class="icon">💧</div>
+            <div class="label">Humedad</div>
+            <div class="value" id="humValue">--%</div>
+            <div class="range">Rango: 40-60%</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="status"></div>
+            <div class="icon">🌫️</div>
+            <div class="label">PM2.5</div>
+            <div class="value" id="pmValue">-- µg/m³</div>
+            <div class="range">Límite: 25 µg/m³</div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card"><canvas id="tempChart"></canvas></div>
+          <div class="card"><canvas id="humChart"></canvas></div>
+          <div class="card"><canvas id="co2Chart"></canvas></div>
+          <div class="card"><canvas id="pmChart"></canvas></div>
+          <div class="card"><canvas id="noiseChart"></canvas></div>
+          <div class="card"><canvas id="lightChart"></canvas></div>
+        </div>
+    </div>
+
+    <script>
+    let tempChart, humChart, co2Chart, pmChart, noiseChart, lightChart;
+
+    async function cargarDatos() {
+      try {
+        const res = await fetch("http://auraa.ddns.net:8000/getmediciones");
+        const datos = await res.json();
+
+        if (!Array.isArray(datos) || datos.length === 0) return;
+
+        const labels = datos.map(d => d.fecha_hora.split("T")[1]);
+
+        const temp = datos.map(d => d.temperatura);
+        const hum = datos.map(d => d.humedad);
+        const co2 = datos.map(d => d.co2);
+        const luz = datos.map(d => d.iluminacion);
+
+        const pm_estaticos = [8, 10, 12, 14, 16, 18];
+        
+        // Obtener ruido del último dato (si existe en la API)
+        const ruido = datos.length > 0 && datos[datos.length - 1].ruido ? datos[datos.length - 1].ruido : 55;
+
+        // Actualizar valores en las tarjetas (último dato)
+        if (datos.length > 0) {
+          const ultimo = datos[datos.length - 1];
+          document.getElementById('tempValue').textContent = `${ultimo.temperatura}°C`;
+          document.getElementById('co2Value').textContent = `${ultimo.co2} ppm`;
+          document.getElementById('noiseValue').textContent = `${ruido} dB`;
+          document.getElementById('lightValue').textContent = `${ultimo.iluminacion} lux`;
+          document.getElementById('humValue').textContent = `${ultimo.humedad}%`;
+          document.getElementById('pmValue').textContent = `${pm_estaticos[pm_estaticos.length - 1]} µg/m³`;
+        }
+
+        actualizarGraficas(labels, temp, hum, co2, pm_estaticos, ruido, luz);
+
+      } catch (error) {
+        console.error("Error al cargar datos:", error);
+      }
+    }
+
+    function crearGraficas(labels, temp, hum, co2, pm, noise, light) {
+
+      tempChart = new Chart(document.getElementById("tempChart"), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{ 
+            label: 'Temperatura (°C)', 
+            data: temp, 
+            borderColor: 'rgb(239, 68, 68)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Temperatura' }
+          }
+        }
+      });
+
+      humChart = new Chart(document.getElementById("humChart"), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{ 
+            label: 'Humedad (%)', 
+            data: hum, 
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Humedad' }
+          }
+        }
+      });
+
+      co2Chart = new Chart(document.getElementById("co2Chart"), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ 
+            label: 'CO2 (ppm)', 
+            data: co2, 
+            backgroundColor: 'rgba(34, 197, 94, 0.6)',
+            borderColor: 'rgb(34, 197, 94)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'CO₂' }
+          }
+        }
+      });
+
+      pmChart = new Chart(document.getElementById("pmChart"), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'PM1.0', data: pm.map(x => x * 0.6), backgroundColor: 'rgba(147, 197, 253, 0.8)' },
+            { label: 'PM2.5', data: pm, backgroundColor: 'rgba(251, 146, 60, 0.8)' },
+            { label: 'PM10', data: pm.map(x => x * 1.8), backgroundColor: 'rgba(156, 163, 175, 0.8)' }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Partículas (PM)' }
+          }
+        }
+      });
+
+      noiseChart = new Chart(document.getElementById("noiseChart"), {
+        type: 'doughnut',
+        data: {
+          labels: ["Ruido", "Restante"],
+          datasets: [{
+            data: [noise, 100 - noise], 
+            backgroundColor: ["rgb(251, 146, 60)", "rgb(229, 231, 235)"]
+          }]
+        },
+        options: { 
+          rotation: -90, 
+          circumference: 180,
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Nivel de Ruido' },
+            legend: { display: false }
+          }
+        }
+      });
+
+      lightChart = new Chart(document.getElementById("lightChart"), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{ 
+            label: "Iluminación (lux)", 
+            data: light, 
+            borderColor: 'rgb(234, 179, 8)',
+            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Iluminación' }
+          }
+        }
+      });
+    }
+
+    function actualizarGraficas(labels, temp, hum, co2, pm, noise, light) {
+
+      if (!tempChart) {
+        crearGraficas(labels, temp, hum, co2, pm, noise, light);
+        return;
+      }
+
+      tempChart.data.labels = labels;
+      humChart.data.labels = labels;
+      co2Chart.data.labels = labels;
+      pmChart.data.labels = labels;
+      lightChart.data.labels = labels;
+
+      tempChart.data.datasets[0].data = temp;
+      humChart.data.datasets[0].data = hum;
+      co2Chart.data.datasets[0].data = co2;
+      lightChart.data.datasets[0].data = light;
+
+      pmChart.data.datasets[0].data = pm.map(x => x * 0.6);
+      pmChart.data.datasets[1].data = pm;
+      pmChart.data.datasets[2].data = pm.map(x => x * 1.8);
+
+      tempChart.update();
+      humChart.update();
+      co2Chart.update();
+      pmChart.update();
+      noiseChart.update();
+      lightChart.update();
+    }
+
+    cargarDatos();
+    setInterval(cargarDatos, 5000);
+    </script>
+
+    <script>
+    (function () {
+        const toggle = document.getElementById("toggleDark");
+        if (!toggle) return;
+
+        const isDark = localStorage.getItem("modo-oscuro") === "true";
+        if (isDark) {
+            // Unifiqué a .dark para que concuerde con tu CSS general
+            document.body.classList.add("dark"); 
+            if (toggle.classList.contains('bi-moon')) toggle.classList.replace('bi-moon', 'bi-sun');
+        } else {
+            if (toggle.classList.contains('bi-sun')) toggle.classList.replace('bi-sun', 'bi-moon');
+        }
+
+        toggle.addEventListener('click', () => {
+            const nowDark = document.body.classList.toggle('dark');
+            localStorage.setItem('modo-oscuro', nowDark);
+
+            if (nowDark) {
+                if (toggle.classList.contains('bi-moon')) toggle.classList.replace('bi-moon', 'bi-sun');
+            } else {
+                if (toggle.classList.contains('bi-sun')) toggle.classList.replace('bi-sun', 'bi-moon');
+            }
+        });
+    })();
+    </script>
+
+    <script>
+        const btnMenu = document.getElementById("btnMenu");
+        const sidebar = document.querySelector(".sidebar");
+        const mainContent = document.querySelector(".main-content");
+
+        btnMenu.addEventListener("click", () => {
+            sidebar.classList.toggle("closed");
+            mainContent.classList.toggle("closed");
+        });
+    </script>
+
+    <script>
+    const nombre = localStorage.getItem("usuarioNombre") || "";
+    const apellido = localStorage.getItem("usuarioApellido") || "";
+
+    const spanUsuario = document.getElementById("nombreUsuario");
+    const circulo = document.getElementById("circuloUsuario");
+
+    let nombreCompleto = nombre;
+    if (apellido) nombreCompleto += " " + apellido;
+    spanUsuario.textContent = nombreCompleto || "Usuario";
+
+    function obtenerIniciales(nombre, apellido) {
+        let iniciales = "";
+
+        if (nombre && apellido) {
+            iniciales = nombre.charAt(0) + apellido.charAt(0);
+        } else if (nombre) {
+            iniciales = nombre.substring(0, 2);
+        } else if (apellido) {
+            iniciales = apellido.substring(0, 2);
+        } else {
+            iniciales = "US";
+        }
+
+        return iniciales.toUpperCase();
+    }
+
+    circulo.textContent = obtenerIniciales(nombre, apellido);
+
+    document.getElementById("btnLogout").addEventListener("click", function () {
+
+    // Limpiar datos de sesión
+    localStorage.removeItem("usuarioNombre");
+    localStorage.removeItem("usuarioApellido");
+    localStorage.removeItem("modo-oscuro");
+
+    // Si manejas token:
+    localStorage.removeItem("token");
+
+    // Redirigir al login
+    window.location.href = "login.html"; // Ajusta si tu login tiene otro nombre
+});
+    </script>
+</body>
+</html>

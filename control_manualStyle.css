@@ -1,0 +1,104 @@
+:root {
+    --gold-light: #FFF3D2;
+    --gold-dark: #C9962D;
+    --gold-darkmode-bg: #332b18;
+    --gold-darkmode-text: #e3c27d;
+}
+
+body { background-color: #f5f5f5; transition: .3s; font-family: "Poppins", sans-serif; margin: 0; }
+body.dark, body.dark-mode { background-color: #111 !important; color: #eee; }
+
+/* TOPBAR */
+.topbar { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: white; padding: 0 30px; align-items: center; border-bottom: 1px solid #ddd; z-index: 1200; transition: .3s; }
+body.dark .topbar, body.dark-mode .topbar { background: #1a1a1a; border-bottom: 1px solid #333; }
+.logo-aura { font-size: 22px; font-weight: 700; color: var(--gold-dark); letter-spacing: 1px; cursor: pointer; transition: .3s; }
+#btnMenu { color: #555; transition: .3s; }
+#btnMenu:hover { color: var(--gold-dark); transform: scale(1.1); }
+.icon-darkmode { font-size: 20px; cursor: pointer; transition: .3s; color: #555; }
+body.dark .icon-darkmode, body.dark-mode .icon-darkmode { color: var(--gold-darkmode-text); }
+
+/* SIDEBAR */
+.sidebar { width: 260px; background: white; position: fixed; top: 70px; left: 0; bottom: 0; border-right: 1px solid #ddd; padding-top: 35px; transition: .3s ease; z-index: 1100; }
+body.dark .sidebar, body.dark-mode .sidebar { background: #1a1a1a; border-right: 1px solid #333; }
+.sidebar a { color: #808080; font-size: 18px; padding: 15px 25px; display: flex; align-items: center; gap: 12px; text-decoration: none; border-radius: 10px; margin: 5px 15px; transition: .3s; }
+.sidebar a:hover { background: var(--gold-light) !important; color: var(--gold-dark) !important; }
+body.dark .sidebar a:hover, body.dark-mode .sidebar a:hover { background: var(--gold-darkmode-bg) !important; color: var(--gold-darkmode-text) !important; }
+.sidebar a.active { background: var(--gold-light) !important; font-weight: 600; color: var(--gold-dark) !important; }
+body.dark .sidebar a.active, body.dark-mode .sidebar a.active { background: var(--gold-darkmode-bg) !important; color: var(--gold-darkmode-text) !important; }
+
+/* COMPORTAMIENTO SIDEBAR DESKTOP */
+.sidebar.closed { left: -260px; }
+.main-content { margin-left: 260px; padding: 100px 40px; transition: .3s ease; }
+.main-content.closed { margin-left: 0 !important; }
+
+/* TARJETAS CONTROL MANUAL */
+.title-section { font-size: 32px; font-weight: bold; }
+.card-device { padding: 20px; border-radius: 18px; background: white; border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: .3s; }
+body.dark .card-device, body.dark-mode .card-device { background: #1f1f1f !important; color: #eee !important; border: 1px solid #333 !important; box-shadow: none !important; }
+.card-device.disabled { opacity: 0.5; pointer-events: none; }
+
+/* SWITCH Y SLIDERS */
+.form-check-input { width: 50px; height: 26px; background-color: #cfcfcf; border-color: #cfcfcf; cursor: pointer; }
+.form-check-input:checked { background-color: #e7ca82 !important; border-color: #e7ca82 !important; }
+body.dark .form-check-input, body.dark-mode .form-check-input { background-color: #555 !important; border-color: #555 !important; }
+input[type=range] { height: 6px; border-radius: 10px; background: #ddd; outline: none; width: 100%; appearance: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; background: #e7ca82; border-radius: 50%; cursor: pointer; }
+body.dark input[type=range], body.dark-mode input[type=range] { background: #444 !important; }
+body.dark input[type=range]::-webkit-slider-thumb, body.dark-mode input[type=range]::-webkit-slider-thumb { background: #e7ca82 !important; }
+.valor-porcentaje { font-weight: 600; color: #c39540; margin-left: 8px; }
+body.dark .valor-porcentaje, body.dark-mode .valor-porcentaje { color: #e3c27d !important; }
+.estado-dispositivo { color: #888; }
+body.dark .estado-dispositivo, body.dark-mode .estado-dispositivo { color: #ccc !important; }
+.connection-status { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #dc3545; margin-right: 8px; animation: pulse 2s infinite; }
+.connection-status.connected { background: #28a745; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* ============================= */
+/* RESPONSIVIDAD (MÓVIL / TABLET)*/
+/* ============================= */
+@media (max-width: 1024px) {
+    .sidebar { width: 220px; }
+    .main-content { margin-left: 220px; padding: 100px 25px; }
+}
+
+@media (max-width: 768px) {
+    /* El truco: Invertimos el comportamiento para celulares sin tocar tu JS */
+    .sidebar { left: -260px; } /* Oculto por defecto */
+    .sidebar.closed { left: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.5); } /* Visible cuando presionas menú */
+    .main-content { margin-left: 0 !important; padding: 90px 20px; }
+    .main-content.closed { margin-left: 0 !important; }
+}
+
+@media (max-width: 480px) {
+    .topbar { padding: 0 15px; }
+    .logo-aura { font-size: 18px; }
+    .main-content { padding: 80px 15px; }
+}
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px); /* resta altura del topbar */
+    padding: 20px 10px;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-logout {
+    margin-top: auto;  /* empuja solo el botón */
+    padding: 12px;
+    background: #F8D7DA;
+    border: none;
+    color: #C0392B;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+}
+
+.btn-logout:hover {
+    background: #f1b0b7;
+}

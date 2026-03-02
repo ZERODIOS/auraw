@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Manual - AURA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="aurastyle.css">
+    <link rel="stylesheet" href="control_manualStyle.css">
+</head>
+<body>
+    <div class="topbar d-flex justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <i id="btnMenu" class="bi bi-list fs-2" style="cursor:pointer;"></i>
+            <i class="bi bi-house-fill fs-3"></i>
+            <span class="logo-aura">AURA</span>
+        </div>
+        <div class="d-flex align-items-center gap-4">
+            <i id="toggleDark" class="bi bi-moon icon-darkmode"></i>
+            <div class="d-flex align-items-center gap-2">
+                <div style="background:#6C7A89; color:white; border-radius:50%; width:46px; height:46px; display:flex; justify-content:center; align-items:center;">US</div>
+                <span>Usuario</span>
+            </div>
+            <i class="bi bi-power text-danger fs-3"></i>
+        </div>
+    </div>
+
+    <div class="sidebar">
+
+    <div class="sidebar-menu">
+        <a href="dashboard.html"><i class="bi bi-bar-chart-fill"></i> Dashboard</a>
+        <a class="active" href="control_maual.html"><i class="bi bi-search"></i> Control Manual</a>
+        <a href="gestion_espacios.html"><i class="bi bi-grid-3x3-gap-fill"></i> Espacios</a>
+        <a href="historial_reportes.html"><i class="bi bi-clock-history"></i> Historial</a>
+    </div>
+
+    <button id="btnLogout" class="btn-logout">
+        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+    </button>
+
+</div>
+    
+    <div class="main-content">
+        <h2 class="title-section mb-4">Control Manual</h2>
+
+        <div class="card-device mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="subtitle d-flex align-items-center">
+                        <span class="connection-status" id="connectionStatus"></span>
+                        Estado del Sistema
+                    </h5>
+                    <small class="text-muted" id="connectionText">Verificando conexión...</small>
+                </div>
+                <button class="btn btn-outline-primary btn-sm" onclick="verificarConexion()">
+                    <i class="bi bi-arrow-clockwise"></i> Verificar
+                </button>
+            </div>
+        </div>
+
+        <div class="card-device mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="subtitle">Modo de operación</h5>
+                    <small class="text-muted">En modo automático, el sistema controla los dispositivos según sensores</small>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span id="modoLabel">Manual</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="modoOperacion">
+                    </div>
+                    <span id="modoLabelAuto">Automático</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card-device" id="cardFoco">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="subtitle d-flex align-items-center">
+                                <i class="bi bi-lightbulb fs-4 me-2"></i> Foco
+                            </h5>
+                            <span class="text-secondary estado-dispositivo" id="estadoFoco">Apagado</span>
+                        </div>
+                        <div class="form-check form-switch fs-4">
+                            <input class="form-check-input" type="checkbox" id="switchFoco">
+                        </div>
+                    </div>
+                    <label class="mt-3">Intensidad <span class="valor-porcentaje" id="valorFoco">0%</span></label>
+                    <input type="range" class="form-range" id="rangoFoco" max="100" value="0">
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-device" id="cardVentilador">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="subtitle d-flex align-items-center">
+                                <i class="bi bi-fan fs-4 me-2"></i> Ventilador
+                            </h5>
+                            <span class="text-secondary estado-dispositivo" id="estadoVentilador">Apagado</span>
+                        </div>
+                        <div class="form-check form-switch fs-4">
+                            <input class="form-check-input" type="checkbox" id="switchVentilador">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-device">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="subtitle d-flex align-items-center">
+                                <i class="bi bi-megaphone fs-4 me-2"></i> Ruido Blanco
+                            </h5>
+                            <span class="text-secondary estado-dispositivo" id="estadoSonido">Apagado</span>
+                        </div>
+                        <div class="form-check form-switch fs-4">
+                            <input class="form-check-input" type="checkbox" id="switchSonido">
+                        </div>
+                    </div>
+                    <label class="mt-3">Volumen <span class="valor-porcentaje" id="valorSonido">0%</span></label>
+                    <input type="range" class="form-range" id="rangoSonido" max="100" value="50">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const API_BASE = "http://auraa.ddns.net:8000/api";
+    const DISPOSITIVO_ID = "ESP32_AURA_01";
+
+    async function verificarConexion() {
+        const status = document.getElementById('connectionStatus');
+        const text = document.getElementById('connectionText');
+        
+        try {
+            const response = await fetch(`${API_BASE}/status?dispositivo_id=${DISPOSITIVO_ID}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                status.classList.add('connected');
+                text.textContent = `Conectado - Modo: ${data.modo_automatico ? 'Automático' : 'Manual'}`;
+                
+                // Actualizar estado de la interfaz
+                document.getElementById('modoOperacion').checked = data.modo_automatico;
+                actualizarModoUI(data.modo_automatico);
+                
+                // Actualizar estados de dispositivos
+                document.getElementById('switchVentilador').checked = data.ventilador_encendido;
+                document.getElementById('estadoVentilador').textContent = data.ventilador_encendido ? 'Encendido' : 'Apagado';
+                
+                document.getElementById('switchFoco').checked = data.foco_encendido;
+                document.getElementById('estadoFoco').textContent = data.foco_encendido ? 'Encendido' : 'Apagado';
+                document.getElementById('rangoFoco').value = data.foco_intensidad;
+                document.getElementById('valorFoco').textContent = data.foco_intensidad + '%';
+            } else {
+                throw new Error('No conectado');
+            }
+        } catch (error) {
+            status.classList.remove('connected');
+            text.textContent = `Sin conexión - ESP32 apagado o desconectado`;
+            console.error('Error de conexión:', error);
+        }
+    }
+
+    function actualizarModoUI(esAutomatico) {
+        const cardFoco = document.getElementById('cardFoco');
+        const cardVentilador = document.getElementById('cardVentilador');
+        
+        if (esAutomatico) {
+            cardFoco.classList.add('disabled');
+            cardVentilador.classList.add('disabled');
+        } else {
+            cardFoco.classList.remove('disabled');
+            cardVentilador.classList.remove('disabled');
+        }
+    }
+
+    // MODO DE OPERACIÓN
+    document.getElementById('modoOperacion').addEventListener('change', async function() {
+        const automatico = this.checked;
+        
+        try {
+            const response = await fetch(`${API_BASE}/modo?automatico=${automatico}&dispositivo_id=${DISPOSITIVO_ID}`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                actualizarModoUI(automatico);
+                console.log(automatico ? '🔄 Modo Automático' : '🔄 Modo Manual');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al cambiar modo');
+            this.checked = !this.checked;
+        }
+    });
+
+    // VENTILADOR
+    document.getElementById('switchVentilador').addEventListener('change', async function() {
+        if (document.getElementById('modoOperacion').checked) {
+            this.checked = !this.checked;
+            alert('Cambia a modo Manual para controlar el ventilador');
+            return;
+        }
+        
+        const endpoint = this.checked ? '/ventilador/on' : '/ventilador/off';
+        
+        try {
+            const response = await fetch(`${API_BASE}${endpoint}?dispositivo_id=${DISPOSITIVO_ID}`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                document.getElementById('estadoVentilador').textContent = this.checked ? 'Encendido' : 'Apagado';
+                console.log(this.checked ? '🌀 Ventilador ON' : '🌀 Ventilador OFF');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al controlar ventilador');
+            this.checked = !this.checked;
+        }
+    });
+
+    // FOCO
+    document.getElementById('switchFoco').addEventListener('change', async function() {
+        if (document.getElementById('modoOperacion').checked) {
+            this.checked = !this.checked;
+            alert('Cambia a modo Manual para controlar el foco');
+            return;
+        }
+        
+        const endpoint = this.checked ? '/foco/on' : '/foco/off';
+        
+        try {
+            const response = await fetch(`${API_BASE}${endpoint}?dispositivo_id=${DISPOSITIVO_ID}`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                document.getElementById('estadoFoco').textContent = this.checked ? 'Encendido' : 'Apagado';
+                console.log(this.checked ? '💡 Foco ON' : '💡 Foco OFF');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al controlar foco');
+            this.checked = !this.checked;
+        }
+    });
+
+    // INTENSIDAD FOCO
+    const rangoFoco = document.getElementById('rangoFoco');
+    const valorFoco = document.getElementById('valorFoco');
+    
+    rangoFoco.addEventListener('input', function() {
+        valorFoco.textContent = this.value + '%';
+    });
+    
+    rangoFoco.addEventListener('change', async function() {
+        if (document.getElementById('modoOperacion').checked) {
+            alert('Cambia a modo Manual para ajustar intensidad');
+            return;
+        }
+        
+        const intensidad = this.value;
+        
+        try {
+            const response = await fetch(`${API_BASE}/foco/intensidad?intensidad=${intensidad}&dispositivo_id=${DISPOSITIVO_ID}`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                console.log(`💡 Intensidad: ${intensidad}%`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    // RUIDO BLANCO (Bocina)
+    const switchSonido = document.getElementById('switchSonido');
+    const rangoSonido = document.getElementById('rangoSonido');
+    
+    switchSonido.addEventListener('change', async function() {
+        const endpoint = this.checked ? '/bocina/play' : '/bocina/stop';
+        
+        try {
+            const response = await fetch(API_BASE + endpoint, { method: 'POST' });
+            
+            if (response.ok) {
+                document.getElementById('estadoSonido').textContent = this.checked ? 'Reproduciendo' : 'Apagado';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            this.checked = !this.checked;
+        }
+    });
+    
+    rangoSonido.addEventListener('input', function() {
+        document.getElementById('valorSonido').textContent = this.value + '%';
+    });
+    
+    rangoSonido.addEventListener('change', async function() {
+        try {
+            await fetch(`${API_BASE}/bocina/volumen?valor=${this.value}`, { method: 'POST' });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    // MODO OSCURO
+    (function () {
+        const toggle = document.getElementById("toggleDark");
+        const saved = localStorage.getItem('modo-oscuro');
+        const isDark = saved === 'true';
+        
+        if (isDark) {
+            document.body.classList.add('dark');
+            toggle.classList.replace('bi-moon', 'bi-sun');
+        }
+        
+        toggle.addEventListener('click', () => {
+            const nowDark = document.body.classList.toggle('dark');
+            localStorage.setItem('modo-oscuro', nowDark ? 'true' : 'false');
+            toggle.classList.toggle('bi-moon');
+            toggle.classList.toggle('bi-sun');
+        });
+    })();
+
+    // MENÚ
+    document.getElementById("btnMenu").addEventListener("click", () => {
+        document.querySelector(".sidebar").classList.toggle("closed");
+        document.querySelector(".main-content").classList.toggle("closed");
+    });
+
+    // INICIALIZACIÓN
+    window.addEventListener('load', () => {
+        verificarConexion();
+        setInterval(verificarConexion, 10000);
+    });
+
+    document.getElementById("btnLogout").addEventListener("click", function () {
+
+    // Limpiar datos de sesión
+    localStorage.removeItem("usuarioNombre");
+    localStorage.removeItem("usuarioApellido");
+    localStorage.removeItem("modo-oscuro");
+
+    // Si manejas token:
+    localStorage.removeItem("token");
+
+    // Redirigir al login
+    window.location.href = "login.html"; // Ajusta si tu login tiene otro nombre
+});
+    </script>
+</body>
+</html>

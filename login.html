@@ -1,0 +1,141 @@
+<!DOCTYPE html> <!-- Define documento HTML5 -->
+<html lang="es"> <!-- Idioma del documento -->
+
+<head>
+    <meta charset="UTF-8"> <!-- Permite caracteres especiales -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <!-- Hace que el diseño sea responsive en móviles -->
+
+    <title>Iniciar Sesión</title> <!-- Título de la pestaña -->
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Tu archivo CSS personalizado -->
+    <link rel="stylesheet" href="loginStyle.css">
+</head>
+
+<body class="auth-bg"> <!-- Clase para fondo general -->
+
+<!-- Contenedor principal usando flex en lugar de row directo -->
+<div class="login-wrapper d-flex flex-column flex-md-row">
+
+    <!-- Sección izquierda (Formulario) -->
+    <div class="left-section col-12 col-md-6 d-flex flex-column justify-content-center">
+
+        <div class="form-container"> <!-- Contenedor interno para centrar contenido -->
+
+            <h1 class="mb-4 login-title">Iniciar Sesión</h1> <!-- Título -->
+
+            <div id="errorBox"></div> <!-- Contenedor para mensajes de error -->
+
+            <form id="loginForm"> <!-- Formulario principal -->
+
+                <label class="mb-2">Correo electrónico</label>
+
+                <div class="position-relative mb-4">
+                    <i class="bi bi-envelope input-icon"></i> <!-- Icono -->
+                    <input type="email" id="email" class="form-control input-custom">
+                </div>
+
+                <label class="mb-2">Contraseña</label>
+
+                <div class="position-relative mb-4">
+                    <i class="bi bi-lock input-icon"></i> <!-- Icono -->
+                    <input type="password" id="password" class="form-control input-custom">
+                </div>
+
+                <a href="restablecer_contra.html" class="forgot-link">
+                    ¿Olvidaste tu contraseña?
+                </a>
+
+                <button type="submit" class="btn-login mt-4">
+                    Inicia sesión
+                </button>
+
+                <p class="mt-4">
+                    ¿No tienes cuenta?
+                    <a href="registro.html" class="register-link">Crear cuenta</a>
+                </p>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Sección derecha (Imagen decorativa) -->
+    <div class="right-section col-12 col-md-6">
+        <!-- La imagen será fondo en desktop y bloque visual en móvil -->
+    </div>
+
+</div>
+
+
+<!-- Script al final para que el DOM ya esté cargado -->
+<script>
+    // Escucha el envío del formulario
+    document.getElementById("loginForm").addEventListener("submit", function(e){
+        
+        e.preventDefault(); // Evita que la página se recargue
+
+        let correo = document.getElementById("email").value.trim(); // Obtiene correo
+        let contraseña = document.getElementById("password").value.trim(); // Obtiene contraseña
+        let cajaError = document.getElementById("errorBox"); // Caja de errores
+
+        cajaError.innerHTML = ""; // Limpia errores previos
+
+        // Validación campos vacíos
+        if(correo === "" || contraseña === ""){
+            cajaError.innerHTML = "<p class='error-text'> Llena todos los campos.</p>";
+            return;
+        }
+
+        // Validación formato correo
+        const validarCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if(!validarCorreo.test(correo)){
+            cajaError.innerHTML = "<p class='error-text'>Ingresa un correo válido.</p>";
+            return;
+        }
+
+        // Validación longitud contraseña
+        if(contraseña.length < 6){
+            cajaError.innerHTML = "<p class='error-text'>La contraseña debe tener mínimo 6 caracteres.</p>";
+            return;
+        }
+
+        // Petición a la API
+        fetch("http://auraa.ddns.net:8000/getusuarios")
+        .then(response => response.json())
+        .then(lista => {
+
+            const usuarioEncontrado = lista.find(u => 
+                u.correo === correo && u.contra === contraseña
+            );
+
+            if (usuarioEncontrado) {
+
+                localStorage.setItem("usuarioNombre", usuarioEncontrado.nombre);
+                localStorage.setItem("usuarioApellidoP", usuarioEncontrado.apellido_p);
+                localStorage.setItem("usuarioApellidoM", usuarioEncontrado.apellido_m);
+                localStorage.setItem("usuarioRol", usuarioEncontrado.id_rol);
+                localStorage.setItem("user", JSON.stringify(usuarioEncontrado));
+
+                window.location.href = "dashboard.html";
+
+            } else {
+                cajaError.innerHTML = "<p class='error-text'>Correo o contraseña incorrectos.</p>";
+            }
+        })
+        .catch(error => {
+            cajaError.innerHTML = "<p class='error-text'>Error al conectar con el servidor.</p>";
+        });
+
+    });
+</script>
+
+</body>
+</html>
